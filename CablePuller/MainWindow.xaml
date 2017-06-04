@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CablePuller"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="768" Width="1024">
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="9*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Name="txtPDFpath" Background="AliceBlue" Padding="5,0,5,0"  Text="Select PDF file" VerticalContentAlignment="Center" Grid.Column="0"/>
+            <Button Name="btnBrowse" Click="btnBrowse_Click" Content="Browse" Grid.Column="1"/>
+
+        </Grid>
         
+        <Image Name="pdfImage" Stretch="UniformToFill" Grid.Row="1"/>
+
     </Grid>
 </Window>

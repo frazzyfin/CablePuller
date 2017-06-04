@@ -41,11 +41,35 @@ namespace CablePuller
                 foreach (MagickImage image in images)
                 {
                     // Write page to file that contains the page number
-                    Trace.Write("Converting page " + page + "...");
                     image.Write(@"ConvertedImages\Example.Page" + page + ".png");
-                    Trace.WriteLine("done");
                     page++;
                 }
+            }
+
+            // Show the pdf image we just made on the window
+            BitmapImage img = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\ConvertedImages\Example.Page1.png", UriKind.Absolute));
+            pdfImage.Source = img;
+        }
+
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            // Create OpenFileDialog 
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            // Set filter for file extension and default file extension 
+            dlg.DefaultExt = ".pdf";
+            dlg.Filter = "PDF Files (*.pdf)|*.pdf";
+
+
+            // Display OpenFileDialog by calling ShowDialog method 
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Get the selected file name and display in a TextBox 
+            if (result == true)
+            {
+                // Open document 
+                string filename = dlg.FileName;
+                txtPDFpath.Text = filename;
             }
         }
     }
