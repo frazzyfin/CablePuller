@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Diagnostics;
 using ImageMagick;
+using CablePuller.Utils;
 
 namespace CablePuller
 {
@@ -27,42 +28,6 @@ namespace CablePuller
         {
             InitializeComponent();
             Directory.CreateDirectory("ConvertedImages");
-        }
-
-
-        // Given a path to a PDF file, converts it to a PNG, and returns the path to the picture
-        private string convertPDFtoPNG(string path)
-        {
-            MagickReadSettings settings = new MagickReadSettings();
-            // Settings the density to 300 dpi will create an image with a better quality
-            settings.Density = new Density(100, 100);
-
-            using (MagickImageCollection images = new MagickImageCollection())
-            {
-                // Add all the pages of the pdf file to the collection
-                images.Read(path, settings);
-
-                // Empty the write directory before we create the PNGs
-                System.IO.DirectoryInfo di = new DirectoryInfo("ConvertedImages");
-                foreach (FileInfo file in di.GetFiles())
-                {
-                    file.Delete();
-                }
-                foreach (DirectoryInfo dir in di.GetDirectories())
-                {
-                    dir.Delete(true);
-                }
-
-                int page = 1;
-                foreach (MagickImage image in images)
-                {
-                    // Write page to file that contains the page number
-                    image.Write(@"ConvertedImages\pdfimg" + page + ".png");
-                    page++;
-                }
-
-                return System.IO.Path.GetFullPath(@"ConvertedImages\pdfimg1.png");
-            }
         }
 
         public static BitmapImage BitmapFromUri(Uri source)
@@ -98,9 +63,7 @@ namespace CablePuller
         }
 
         private void btnConvert_Click(object sender, RoutedEventArgs e)
-        {
-
-
+        { 
             pdfImage.Source = null;
             pdfImage.Visibility = Visibility.Hidden;
 
@@ -116,7 +79,7 @@ namespace CablePuller
                 return;
             }
 
-            string imagePath = convertPDFtoPNG(path);
+            string imagePath = Utils.PDFUtils.convertPDFtoPNG(path);
 
             // Show the pdf image we just made on the window
             BitmapImage img = BitmapFromUri(new Uri(imagePath));
