@@ -27,28 +27,52 @@ namespace CablePuller
         {
             InitializeComponent();
             Directory.CreateDirectory("ConvertedImages");
+        }
 
+
+        // Given a path to a PDF file, converts it to a PNG, and returns the path to the picture
+        private string convertPDFtoPNG(string path)
+        {
             MagickReadSettings settings = new MagickReadSettings();
             // Settings the density to 300 dpi will create an image with a better quality
-            settings.Density = new Density(300, 300);
+            settings.Density = new Density(100, 100);
 
             using (MagickImageCollection images = new MagickImageCollection())
             {
                 // Add all the pages of the pdf file to the collection
-                images.Read("Example.pdf", settings);
+                images.Read(path, settings);
+
+                // Empty the write directory before we create the PNGs
+                System.IO.DirectoryInfo di = new DirectoryInfo("ConvertedImages");
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
 
                 int page = 1;
                 foreach (MagickImage image in images)
                 {
                     // Write page to file that contains the page number
-                    image.Write(@"ConvertedImages\Example.Page" + page + ".png");
+                    image.Write(@"ConvertedImages\pdfimg" + page + ".png");
                     page++;
                 }
-            }
 
-            // Show the pdf image we just made on the window
-            BitmapImage img = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + @"\ConvertedImages\Example.Page1.png", UriKind.Absolute));
-            pdfImage.Source = img;
+                return System.IO.Path.GetFullPath(@"ConvertedImages\pdfimg1.png");
+            }
+        }
+
+        public static BitmapImage BitmapFromUri(Uri source)
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = source;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            return bitmap;
         }
 
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
@@ -71,6 +95,33 @@ namespace CablePuller
                 string filename = dlg.FileName;
                 txtPDFpath.Text = filename;
             }
+        }
+
+        private void btnConvert_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            pdfImage.Source = null;
+            pdfImage.Visibility = Visibility.Hidden;
+
+            string path;
+            // Validate the path
+            try
+            {
+                path = System.IO.Path.GetFullPath(txtPDFpath.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Invalid path", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            string imagePath = convertPDFtoPNG(path);
+
+            // Show the pdf image we just made on the window
+            BitmapImage img = BitmapFromUri(new Uri(imagePath));
+            pdfImage.Source = img;
+            pdfImage.Visibility = Visibility.Visible;
         }
     }
 }
