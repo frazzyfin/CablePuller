@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Diagnostics;
 using ImageMagick;
+using CablePuller.Utils;
 
 namespace CablePuller
 {
@@ -23,46 +24,13 @@ namespace CablePuller
     /// </summary>
     public partial class MainWindow : Window
     {
+        const double ZOOM_SPEED = 0.1;  // How far a mousewheel click zooms in
+        double imageScale = 1.0;        // The current scale level of the image
+
         public MainWindow()
         {
             InitializeComponent();
             Directory.CreateDirectory("ConvertedImages");
-        }
-
-
-        // Given a path to a PDF file, converts it to a PNG, and returns the path to the picture
-        private string convertPDFtoPNG(string path)
-        {
-            MagickReadSettings settings = new MagickReadSettings();
-            // Settings the density to 300 dpi will create an image with a better quality
-            settings.Density = new Density(100, 100);
-
-            using (MagickImageCollection images = new MagickImageCollection())
-            {
-                // Add all the pages of the pdf file to the collection
-                images.Read(path, settings);
-
-                // Empty the write directory before we create the PNGs
-                System.IO.DirectoryInfo di = new DirectoryInfo("ConvertedImages");
-                foreach (FileInfo file in di.GetFiles())
-                {
-                    file.Delete();
-                }
-                foreach (DirectoryInfo dir in di.GetDirectories())
-                {
-                    dir.Delete(true);
-                }
-
-                int page = 1;
-                foreach (MagickImage image in images)
-                {
-                    // Write page to file that contains the page number
-                    image.Write(@"ConvertedImages\pdfimg" + page + ".png");
-                    page++;
-                }
-
-                return System.IO.Path.GetFullPath(@"ConvertedImages\pdfimg1.png");
-            }
         }
 
         public static BitmapImage BitmapFromUri(Uri source)
@@ -98,12 +66,7 @@ namespace CablePuller
         }
 
         private void btnConvert_Click(object sender, RoutedEventArgs e)
-        {
-
-
-            pdfImage.Source = null;
-            pdfImage.Visibility = Visibility.Hidden;
-
+        { 
             string path;
             // Validate the path
             try
@@ -116,12 +79,37 @@ namespace CablePuller
                 return;
             }
 
-            string imagePath = convertPDFtoPNG(path);
+            string imagePath = Utils.PDFUtils.convertPDFtoPNG(path);
 
             // Show the pdf image we just made on the window
             BitmapImage img = BitmapFromUri(new Uri(imagePath));
             pdfImage.Source = img;
             pdfImage.Visibility = Visibility.Visible;
+        }
+
+
+        private void pdfImage_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScaleTransform scale;
+
+            // ZOOM IN if delta is +ve, ZOOM OUT if -ve
+            if (e.Delta > 0)
+                imageScale += ZOOM_SPEED;
+            else
+                imageScale -= ZOOM_SPEED;
+            
+            scale = new ScaleTransform(imageScale, imageScale);
+
+            TransformGroup myTransformGroup = new TransformGroup();
+            myTransformGroup.Children.Add(scale);
+
+            // Render the image with new scale
+            pdfImage.RenderTransform = myTransformGroup;
+        }
+
+        private void ImageBorder_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
         }
     }
 }
