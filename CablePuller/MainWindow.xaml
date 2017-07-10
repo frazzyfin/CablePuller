@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="8*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            
+
             <Button Name="btnBrowse" Click="btnBrowse_Click" Content="Browse" Grid.Column="0"/>
             <TextBox Name="txtPDFpath" Background="AliceBlue" Padding="5,0,5,0" VerticalContentAlignment="Center" Grid.Column="1"/>
             <Button Name="btnConvert" Click="btnConvert_Click" Content="OK" Grid.Column="2"/>
@@ -27,7 +27,17 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <Border Name="ImageBorder" MouseWheel="pdfImage_MouseWheel" ClipToBounds="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Background="#FFD0FFF4">
+                <Label Content="Image Size" />
+                <TextBox Name="txtImgSize" Height="23" Margin="5" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <Border Name="ImageBorder" MouseWheel="pdfImage_MouseWheel" ClipToBounds="True" Grid.Column="1">
                 <Image Name="pdfImage" Stretch="Uniform"/>
             </Border>
         </Grid>

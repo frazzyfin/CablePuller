@@ -26,11 +26,16 @@ namespace CablePuller
     {
         const double ZOOM_SPEED = 0.1;  // How far a mousewheel click zooms in
         double imageScale = 1.0;        // The current scale level of the image
+        double imageScaledWidth;
+        double imageScaledHeight;
 
         public MainWindow()
         {
             InitializeComponent();
             Directory.CreateDirectory("ConvertedImages");
+
+            imageScaledWidth = pdfImage.ActualWidth;
+            imageScaledHeight = pdfImage.ActualHeight;
         }
 
         public static BitmapImage BitmapFromUri(Uri source)
@@ -96,8 +101,14 @@ namespace CablePuller
             if (e.Delta > 0)
                 imageScale += ZOOM_SPEED;
             else
+            {
+                // Stop them from zooming too far out
+                if (((pdfImage.ActualWidth - 20) > imageScaledWidth) ||
+                    ((pdfImage.ActualHeight - 20) > imageScaledHeight))
+                    return;
+
                 imageScale -= ZOOM_SPEED;
-            
+            }
             scale = new ScaleTransform(imageScale, imageScale);
 
             TransformGroup myTransformGroup = new TransformGroup();
@@ -105,11 +116,13 @@ namespace CablePuller
 
             // Render the image with new scale
             pdfImage.RenderTransform = myTransformGroup;
-        }
 
-        private void ImageBorder_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
+            // Update size of image after scaling
+            imageScaledWidth = pdfImage.ActualWidth * imageScale;
+            imageScaledHeight = pdfImage.ActualHeight * imageScale;
 
+            // Update values column
+            txtImgSize.Text = string.Format("{0:D}, {1:D}", Convert.ToInt32(imageScaledWidth), Convert.ToInt32(imageScaledHeight));
         }
     }
 }

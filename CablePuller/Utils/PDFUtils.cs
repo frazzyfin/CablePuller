@@ -37,15 +37,9 @@ namespace CablePuller.Utils
                     dir.Delete(true);
                 }
 
-                int page = 1;
-                foreach (MagickImage image in images)
-                {
-                    // Write page to file that contains the page number
-                    image.Write(@"ConvertedImages\" + IMAGENAME + page + ".png");
-                    page++;
-                }
+                images[0].Write(@"ConvertedImages\" + IMAGENAME + ".png");
 
-                return System.IO.Path.GetFullPath(@"ConvertedImages\" + IMAGENAME + PAGETODISPLAY + ".png");
+                return System.IO.Path.GetFullPath(@"ConvertedImages\" + IMAGENAME + ".png");
             }
         }
     }
