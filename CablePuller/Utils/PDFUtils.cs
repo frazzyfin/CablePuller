@@ -10,7 +10,9 @@ namespace CablePuller.Utils
 {
     class PDFUtils
     {
-        const int PDFQUALITY = 100; // Quality of converted image, measured in DPI
+        const int PDFQUALITY = 100;         // Quality of converted image, measured in DPI
+        const string IMAGENAME = "pdfImg";  // Name of converted images
+        const int PAGETODISPLAY = 1;        // The page of the PDF to show in the UI
 
         // Given a path to a PDF file, converts it to a PNG, and returns the path to the picture
         public static string convertPDFtoPNG(string path)
@@ -39,11 +41,11 @@ namespace CablePuller.Utils
                 foreach (MagickImage image in images)
                 {
                     // Write page to file that contains the page number
-                    image.Write(@"ConvertedImages\pdfimg" + page + ".png");
+                    image.Write(@"ConvertedImages\" + IMAGENAME + page + ".png");
                     page++;
                 }
 
-                return System.IO.Path.GetFullPath(@"ConvertedImages\pdfimg1 .png");
+                return System.IO.Path.GetFullPath(@"ConvertedImages\" + IMAGENAME + PAGETODISPLAY + ".png");
             }
         }
     }
