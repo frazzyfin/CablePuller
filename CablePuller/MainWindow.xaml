@@ -25,8 +25,12 @@
             <Button Name="btnConvert" Click="btnConvert_Click" Content="OK" Grid.Column="2"/>
 
         </Grid>
-        
-        <Image Name="pdfImage" Stretch="UniformToFill" Grid.Row="1"/>
+
+        <Grid Grid.Row="1">
+            <Border Name="ImageBorder" MouseWheel="pdfImage_MouseWheel" ClipToBounds="True">
+                <Image Name="pdfImage" Stretch="Uniform"/>
+            </Border>
+        </Grid>
 
     </Grid>
 </Window>

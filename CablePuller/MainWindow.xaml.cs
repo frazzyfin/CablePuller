@@ -24,6 +24,9 @@ namespace CablePuller
     /// </summary>
     public partial class MainWindow : Window
     {
+        const double ZOOM_SPEED = 0.1;  // How far a mousewheel click zooms in
+        double imageScale = 1.0;        // The current scale level of the image
+
         public MainWindow()
         {
             InitializeComponent();
@@ -64,9 +67,6 @@ namespace CablePuller
 
         private void btnConvert_Click(object sender, RoutedEventArgs e)
         { 
-            pdfImage.Source = null;
-            pdfImage.Visibility = Visibility.Hidden;
-
             string path;
             // Validate the path
             try
@@ -85,6 +85,31 @@ namespace CablePuller
             BitmapImage img = BitmapFromUri(new Uri(imagePath));
             pdfImage.Source = img;
             pdfImage.Visibility = Visibility.Visible;
+        }
+
+
+        private void pdfImage_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScaleTransform scale;
+
+            // ZOOM IN if delta is +ve, ZOOM OUT if -ve
+            if (e.Delta > 0)
+                imageScale += ZOOM_SPEED;
+            else
+                imageScale -= ZOOM_SPEED;
+            
+            scale = new ScaleTransform(imageScale, imageScale);
+
+            TransformGroup myTransformGroup = new TransformGroup();
+            myTransformGroup.Children.Add(scale);
+
+            // Render the image with new scale
+            pdfImage.RenderTransform = myTransformGroup;
+        }
+
+        private void ImageBorder_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+
         }
     }
 }
